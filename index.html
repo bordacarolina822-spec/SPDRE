@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPDR E - Solicitud de Derivación</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SPDR E - Sistema Provincial de Derivación</h1>
+            <p>Solicitud de Derivación de Emergencia</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1">
+                <div class="progress-circle">1</div>
+                <div class="progress-label">Paciente</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="progress-circle">2</div>
+                <div class="progress-label">Emergencia</div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="progress-circle">3</div>
+                <div class="progress-label">Confirmar</div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <!-- PASO 1: Identificación del Paciente -->
+            <div class="step active" id="step1">
+                <h2 style="margin-bottom: 24px;">Paso 1: Identificación del Paciente</h2>
+                
+                <div class="alert alert-info">
+                    <span>ℹ️</span>
+                    <div>
+                        <strong>Consulta con HSI:</strong> El sistema intentará validar la identidad consultando la Historia de Salud Integrada. Si la consulta falla, se activará el Protocolo de Paciente Temporal.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dni">DNI del Paciente <span class="required">*</span></label>
+                    <input type="text" id="dni" placeholder="Ej: 12345678" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombres">Nombres <span class="required">*</span></label>
+                    <input type="text" id="nombres" placeholder="Nombres del paciente" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="apellidos">Apellidos <span class="required">*</span></label>
+                    <input type="text" id="apellidos" placeholder="Apellidos del paciente" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edad">Edad <span class="required">*</span></label>
+                    <input type="number" id="edad" placeholder="Edad en años" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="genero">Género <span class="required">*</span></label>
+                    <select id="genero" required>
+                        <option value="">Seleccione...</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="femenino">Femenino</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="validarPaciente()">
+                        Validar con HSI →
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 2: Descripción de la Emergencia -->
+            <div class="step" id="step2">
+                <h2 style="margin-bottom: 24px;">Paso 2: Descripción de la Emergencia</h2>
+
+                <div id="tempIdAlert" class="alert alert-warning" style="display: none;">
+                    <span>⚠️</span>
+                    <div>
+                        <strong>Protocolo de Paciente Temporal Activado</strong>
+                        <p>No se pudo validar con HSI. Se ha generado un ID Temporal para continuar con la atención de emergencia.</p>
+                        <div class="temp-id-badge" id="tempIdDisplay"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nivel de Prioridad (Triage) <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="prioridad" id="prioridad1" value="critico">
+                            <label for="prioridad1" class="radio-label">
+                                🔴 Crítico<br>
+                                <small>Riesgo vital inmediato</small>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="prioridad" id="prioridad2" value="urgente">
+                            <label for="prioridad2" class="radio-label">
+                                🟠 Urgente<br>
+                                <small>Requiere atención rápida</small>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="prioridad" id="prioridad3" value="programado">
+                            <label for="prioridad3" class="radio-label">
+                                🟡 Programado<br>
+                                <small>No urgente</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="motivoConsulta">Motivo de Consulta <span class="required">*</span></label>
+                    <textarea id="motivoConsulta" placeholder="Describa brevemente el motivo de la consulta..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="diagnosticoPresuntivo">Diagnóstico Presuntivo <span class="required">*</span></label>
+                    <input type="text" id="diagnosticoPresuntivo" placeholder="Ej: IAM, ACV, Trauma craneal..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Recurso Crítico Requerido <span class="required">*</span></label>
+                    <div class="resource-list" id="resourceList">
+                        <div class="resource-item" onclick="selectResource(this, 'uci')">
+                            <div>
+                                <div class="resource-name">Cama UCI</div>
+                                <small>Unidad de Cuidados Intensivos</small>
+                            </div>
+                            <span class="resource-availability available">Disponible</span>
+                        </div>
+                        <div class="resource-item" onclick="selectResource(this, 'respirador')">
+                            <div>
+                                <div class="resource-name">Respirador</div>
+                                <small>Ventilación mecánica</small>
+                            </div>
+                            <span class="resource-availability limited">Limitado</span>
+                        </div>
+                        <div class="resource-item" onclick="selectResource(this, 'quirofano')">
+                            <div>
+                                <div class="resource-name">Quirófano</div>
+                                <small>Cirugía de emergencia</small>
+                            </div>
+                            <span class="resource-availability available">Disponible</span>
+                        </div>
+                        <div class="resource-item" onclick="selectResource(this, 'tomografia')">
+                            <div>
+                                <div class="resource-name">Tomografía</div>
+                                <small>Estudio de diagnóstico</small>
+                            </div>
+                            <span class="resource-availability available">Disponible</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="observaciones">Observaciones Adicionales</label>
+                    <textarea id="observaciones" placeholder="Información adicional relevante..."></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="cambiarPaso(1)">
+                        ← Anterior
+                    </button>
+                    <button class="btn btn-primary" onclick="cambiarPaso(3)">
+                        Continuar →
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 3: Confirmación y Envío -->
+            <div class="step" id="step3">
+                <h2 style="margin-bottom: 24px;">Paso 3: Confirmación de Solicitud</h2>
+
+                <div class="alert alert-info">
+                    <span>ℹ️</span>
+                    <div>
+                        Revise los datos antes de enviar. El sistema buscará automáticamente el hospital más adecuado y enviará la solicitud de forma inmediata.
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3 style="margin-bottom: 16px;">Datos del Paciente</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">DNI:</span>
+                        <span class="summary-value" id="summaryDni"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Nombre:</span>
+                        <span class="summary-value" id="summaryNombre"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Edad:</span>
+                        <span class="summary-value" id="summaryEdad"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Estado de Validación:</span>
+                        <span class="summary-value" id="summaryValidacion"></span>
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3 style="margin-bottom: 16px;">Detalles de la Emergencia</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">Prioridad:</span>
+                        <span class="summary-value" id="summaryPrioridad"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Diagnóstico:</span>
+                        <span class="summary-value" id="summaryDiagnostico"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Recurso Requerido:</span>
+                        <span class="summary-value" id="summaryRecurso"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Motivo:</span>
+                        <span class="summary-value" id="summaryMotivo"></span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="cambiarPaso(2)">
+                        ← Anterior
+                    </button>
+                    <button class="btn btn-success" onclick="enviarSolicitud()">
+                        ✓ Enviar Solicitud
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pantalla de Carga -->
+            <div class="loading" id="loadingScreen">
+                <div class="spinner"></div>
+                <h3>Enviando solicitud...</h3>
+                <p>Buscando hospital óptimo y enviando notificación</p>
+            </div>
+
+            <!-- Pantalla de Éxito -->
+            <div class="step" id="successScreen">
+                <div style="text-align: center;">
+                    <div class="success-icon">✓</div>
+                    <h2 style="color: var(--success-color); margin-bottom: 16px;">¡Solicitud Enviada Exitosamente!</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">
+                        La solicitud de derivación ha sido enviada al hospital. Recibirá una notificación cuando sea aceptada.
+                    </p>
+                    
+                    <div class="summary-section" style="text-align: left;">
+                        <div class="summary-item">
+                            <span class="summary-label">ID de Solicitud:</span>
+                            <span class="summary-value" id="solicitudId"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Hora de Envío:</span>
+                            <span class="summary-value" id="horaEnvio"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Hospital Destino:</span>
+                            <span class="summary-value" id="hospitalDestino"></span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success" style="margin-top: 24px;">
+                        <span>✓</span>
+                        <div style="text-align: left;">
+                            <strong>Próximos pasos:</strong>
+                            <ul style="margin-top: 8px; margin-left: 20px;">
+                                <li>El hospital revisará la solicitud</li>
+                                <li>Recibirá confirmación en menos de 15 minutos</li>
+                                <li>Puede hacer seguimiento en tiempo real</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="button-group" style="margin-top: 32px;">
+                        <button class="btn btn-primary" onclick="nuevaSolicitud()">
+                            Nueva Solicitud
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
