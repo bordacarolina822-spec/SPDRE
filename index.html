@@ -60,23 +60,56 @@
                     <input type="number" id="edad" placeholder="Edad en años" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="genero">Género <span class="required">*</span></label>
-                    <select id="genero" required>
-                        <option value="">Seleccione...</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="femenino">Femenino</option>
-                        <option value="otro">Otro</option>
-                    </select>
-                </div>
+<!-- Busca esta sección en el Paso 1 -->
+<div class="form-group">
+    <label for="genero">Género <span class="required">*</span></label>
+    <select id="genero" required>
+        <option value="">Seleccione...</option>
+        <option value="masculino">Masculino</option>
+        <option value="femenino">Femenino</option>
+        <option value="otro">Otro</option>
+    </select>
+</div>
 
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="validarPaciente()">
-                        Validar con HSI →
-                    </button>
-                </div>
-            </div>
+<!-- AGREGA ESTAS DOS SECCIONES NUEVAS AQUÍ -->
+<div class="form-group">
+    <label for="capsOrigen">CAPS de Origen <span class="required">*</span></label>
+    <select id="capsOrigen" required>
+        <option value="">Seleccione el CAPS...</option>
+        <option value="caps_eva_peron">CAPS Eva Perón</option>
+        <option value="caps_virgen_cerros">CAPS Virgen de los Cerros</option>
+        <option value="caps_san_vicente">CAPS San Vicente de Paul</option>
+        <option value="caps_cochangasta">CAPS Cochangasta</option>
+        <option value="caps_sanagasta">CAPS Sanagasta</option>
+        <option value="caps_los_talas">CAPS Los Talas</option>
+        <option value="caps_castro_barros">CAPS Castro Barros</option>
+        <option value="caps_la_cruz">CAPS La Cruz</option>
+        <option value="caps_breakman">CAPS Breakman</option>
+        <option value="caps_el_brete">CAPS El Brete</option>
+    </select>
+</div>
 
+<div class="form-group">
+    <label for="hospitalDestino">Hospital Destino Preferido</label>
+    <select id="hospitalDestino">
+        <option value="">Sistema seleccionará automáticamente...</option>
+        <option value="hospital_vera_barros">Hospital Provincial Dr. Enrique Vera Barros</option>
+        <option value="hospital_madre_nino">Hospital de la Madre y el Niño</option>
+        <option value="hospital_perrando">Hospital Perrando</option>
+        <option value="hospital_san_juan">Hospital San Juan de Dios</option>
+        <option value="hospital_angel_padilla">Hospital Dr. Ángel C. Padilla</option>
+    </select>
+    <small style="color: var(--text-muted); font-size: 13px; display: block; margin-top: 6px;">
+        ℹ️ Opcional: El sistema sugerirá el hospital óptimo según disponibilidad
+    </small>
+</div>
+
+<!-- Continúa con el resto del código -->
+<div class="button-group">
+    <button class="btn btn-primary" onclick="validarPaciente()">
+        Validar con HSI →
+    </button>
+</div>
             <!-- PASO 2: Descripción de la Emergencia -->
             <div class="step" id="step2">
                 <h2 style="margin-bottom: 24px;">Paso 2: Descripción de la Emergencia</h2>

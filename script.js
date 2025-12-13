@@ -93,6 +93,7 @@ function selectResource(element, resourceType) {
     };
 }
 
+// REEMPLAZA tu función llenarResumen() con esta versión mejorada:
 function llenarResumen() {
     // Datos del paciente (con valores por defecto si están vacíos)
     document.getElementById('summaryDni').textContent = 
@@ -134,8 +135,34 @@ function llenarResumen() {
     
     document.getElementById('summaryMotivo').textContent = 
         document.getElementById('motivoConsulta').value || 'No especificado';
+    
+    // NUEVO: Agregar CAPS de origen
+    const capsOrigen = document.getElementById('capsOrigen').value;
+    const capsOrigenElement = document.createElement('div');
+    capsOrigenElement.className = 'summary-item';
+    capsOrigenElement.innerHTML = `
+        <span class="summary-label">CAPS de Origen:</span>
+        <span class="summary-value">${obtenerNombreCAPS(capsOrigen)}</span>
+    `;
+    
+    // NUEVO: Agregar Hospital destino
+    const hospitalDestino = document.getElementById('hospitalDestino').value;
+    const hospitalDestinoElement = document.createElement('div');
+    hospitalDestinoElement.className = 'summary-item';
+    hospitalDestinoElement.innerHTML = `
+        <span class="summary-label">Hospital Destino:</span>
+        <span class="summary-value">${obtenerNombreHospital(hospitalDestino)}</span>
+    `;
+    
+    // Insertar estos nuevos elementos en el resumen
+    const summarySection = document.querySelectorAll('.summary-section')[0];
+    summarySection.appendChild(capsOrigenElement);
+    
+    const emergencySummary = document.querySelectorAll('.summary-section')[1];
+    emergencySummary.appendChild(hospitalDestinoElement);
 }
 
+// REEMPLAZA tu función enviarSolicitud() con esta versión:
 function enviarSolicitud() {
     // Ocultar el formulario
     document.getElementById('step3').classList.remove('active');
@@ -158,14 +185,13 @@ function enviarSolicitud() {
         document.getElementById('horaEnvio').textContent = 
             now.toLocaleTimeString('es-AR') + ' - ' + now.toLocaleDateString('es-AR');
         
-        // Simular selección de hospital óptimo
-        const hospitales = [
-            'Hospital Provincial Dr. Enrique Vera Barros',
-            'Hospital de la Madre y el Niño',
-            'Hospital Perrando'
-        ];
-        const hospitalSeleccionado = hospitales[Math.floor(Math.random() * hospitales.length)];
-        document.getElementById('hospitalDestino').textContent = hospitalSeleccionado;
+        // MODIFICADO: Usar hospital seleccionado o asignar óptimo
+        let hospitalFinal = document.getElementById('hospitalDestino').value;
+        if (!hospitalFinal) {
+            hospitalFinal = seleccionarHospitalOptimo();
+        }
+        
+        document.getElementById('hospitalDestino').textContent = obtenerNombreHospital(hospitalFinal);
 
         // Actualizar barra de progreso
         document.querySelectorAll('.progress-step').forEach(s => {
@@ -175,6 +201,7 @@ function enviarSolicitud() {
     }, 3000);
 }
 
+// REEMPLAZA tu función nuevaSolicitud() con esta versión:
 function nuevaSolicitud() {
     // Resetear formulario
     document.getElementById('dni').value = '';
@@ -182,6 +209,8 @@ function nuevaSolicitud() {
     document.getElementById('apellidos').value = '';
     document.getElementById('edad').value = '';
     document.getElementById('genero').value = '';
+    document.getElementById('capsOrigen').value = ''; // NUEVO
+    document.getElementById('hospitalDestino').value = ''; // NUEVO
     document.getElementById('motivoConsulta').value = '';
     document.getElementById('diagnosticoPresuntivo').value = '';
     document.getElementById('observaciones').value = '';
@@ -208,4 +237,48 @@ function nuevaSolicitud() {
     // Volver al paso 1
     document.getElementById('successScreen').classList.remove('active');
     cambiarPaso(1);
+}
+
+// ============================================
+// NUEVAS FUNCIONES PARA CAPS Y HOSPITALES
+// ============================================
+
+// Mapeo de nombres legibles
+const capsNombres = {
+    'caps_eva_peron': 'CAPS Eva Perón',
+    'caps_virgen_cerros': 'CAPS Virgen de los Cerros',
+    'caps_san_vicente': 'CAPS San Vicente de Paul',
+    'caps_cochangasta': 'CAPS Cochangasta',
+    'caps_sanagasta': 'CAPS Sanagasta',
+    'caps_los_talas': 'CAPS Los Talas',
+    'caps_castro_barros': 'CAPS Castro Barros',
+    'caps_la_cruz': 'CAPS La Cruz',
+    'caps_breakman': 'CAPS Breakman',
+    'caps_el_brete': 'CAPS El Brete'
+};
+
+const hospitalNombres = {
+    'hospital_vera_barros': 'Hospital Provincial Dr. Enrique Vera Barros',
+    'hospital_madre_nino': 'Hospital de la Madre y el Niño',
+    'hospital_perrando': 'Hospital Perrando',
+    'hospital_san_juan': 'Hospital San Juan de Dios',
+    'hospital_angel_padilla': 'Hospital Dr. Ángel C. Padilla'
+};
+
+// Función para obtener nombre legible del CAPS
+function obtenerNombreCAPS(codigo) {
+    return capsNombres[codigo] || 'CAPS no especificado';
+}
+
+// Función para obtener nombre legible del Hospital
+function obtenerNombreHospital(codigo) {
+    if (!codigo) return 'Sistema seleccionará automáticamente';
+    return hospitalNombres[codigo] || 'Hospital no especificado';
+}
+
+// Función para seleccionar hospital óptimo automáticamente
+function seleccionarHospitalOptimo() {
+    const hospitalesDisponibles = Object.keys(hospitalNombres);
+    const hospitalAleatorio = hospitalesDisponibles[Math.floor(Math.random() * hospitalesDisponibles.length)];
+    return hospitalAleatorio;
 }
