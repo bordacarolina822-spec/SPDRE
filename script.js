@@ -191,7 +191,8 @@ function enviarSolicitud() {
             hospitalFinal = seleccionarHospitalOptimo();
         }
         
-        document.getElementById('hospitalDestino').textContent = obtenerNombreHospital(hospitalFinal);
+        // CAMBIO AQUÍ: usar hospitalDestinoFinal en lugar de hospitalDestino
+        document.getElementById('hospitalDestinoFinal').textContent = obtenerNombreHospital(hospitalFinal);
 
         // Actualizar barra de progreso
         document.querySelectorAll('.progress-step').forEach(s => {
@@ -200,7 +201,6 @@ function enviarSolicitud() {
         });
     }, 3000);
 }
-
 // REEMPLAZA tu función nuevaSolicitud() con esta versión:
 function nuevaSolicitud() {
     // Resetear formulario
